@@ -1,10 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/recyclerview_transform"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:layoutManager="GridLayoutManager"
-    app:spanCount="4"
-    tools:context=".ui.transform.MatchFragment" />
+    android:orientation="vertical"
+    tools:context=".ui.transform.MatchFragment">
+
+    <EditText
+        android:id="@+id/match_name_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Match Name" />
+
+    <EditText
+        android:id="@+id/place_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Place" />
+
+    <EditText
+        android:id="@+id/overs_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Number of Overs"
+        android:inputType="number" />
+
+    <EditText
+        android:id="@+id/max_overs_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Max Overs per Bowler"
+        android:inputType="number" />
+
+    <EditText
+        android:id="@+id/extra_run_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Wide/No-Ball Extra Run Value"
+        android:inputType="number" />
+
+    <Button
+        android:id="@+id/date_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Select Date" />
+
+    <Button
+        android:id="@+id/create_match_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Create Match" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerview_transform"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        app:layoutManager="GridLayoutManager"
+        app:spanCount="4" />
+
+</LinearLayout>

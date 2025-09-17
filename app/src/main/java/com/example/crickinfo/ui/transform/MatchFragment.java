@@ -1,11 +1,16 @@
 package com.example.crickinfo.ui.transform;
 
+import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
@@ -19,6 +24,8 @@ import com.example.crickinfo.R;
 import com.example.crickinfo.databinding.FragmentTransformBinding;
 import com.example.crickinfo.databinding.ItemTransformBinding;
 
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Arrays;
 import java.util.List;
 
@@ -31,6 +38,8 @@ import java.util.List;
 public class MatchFragment extends Fragment {
 
     private FragmentTransformBinding binding;
+    private List<Match> matches = new ArrayList<>();
+    private MatchAdapter matchAdapter;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -40,11 +49,72 @@ public class MatchFragment extends Fragment {
         binding = FragmentTransformBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        RecyclerView recyclerView = binding.recyclerviewTransform;
-        ListAdapter<String, TransformViewHolder> adapter = new TransformAdapter();
-        recyclerView.setAdapter(adapter);
-        transformViewModel.getTexts().observe(getViewLifecycleOwner(), adapter::submitList);
+        matchAdapter = new MatchAdapter(matches, this::editMatch);
+        binding.recyclerviewTransform.setAdapter(matchAdapter);
+
+        setupCreateMatchForm(root);
+        setupEmailIcon(root);
+
         return root;
+    }
+
+    private void setupEmailIcon(View root) {
+        ImageView emailIcon = root.findViewById(R.id.email_icon);
+        emailIcon.setOnClickListener(v -> {
+            Intent emailIntent = new Intent(Intent.ACTION_SEND);
+            emailIntent.setType("text/plain");
+            emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Create Match");
+            emailIntent.putExtra(Intent.EXTRA_TEXT, "Fill out the match details in the app.");
+            startActivity(Intent.createChooser(emailIntent, "Send Email"));
+        });
+    }
+
+    private void setupCreateMatchForm(View root) {
+        EditText matchNameInput = root.findViewById(R.id.match_name_input);
+        EditText placeInput = root.findViewById(R.id.place_input);
+        EditText oversInput = root.findViewById(R.id.overs_input);
+        EditText maxOversInput = root.findViewById(R.id.max_overs_input);
+        EditText extraRunInput = root.findViewById(R.id.extra_run_input);
+        Button dateButton = root.findViewById(R.id.date_button);
+        Button createButton = root.findViewById(R.id.create_match_button);
+
+        final Calendar calendar = Calendar.getInstance();
+        final int[] selectedDate = new int[3];
+
+        dateButton.setOnClickListener(v -> {
+            DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), (view, year, month, dayOfMonth) -> {
+                selectedDate[0] = year;
+                selectedDate[1] = month;
+                selectedDate[2] = dayOfMonth;
+                dateButton.setText(dayOfMonth + "/" + (month + 1) + "/" + year);
+            }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+            datePickerDialog.show();
+        });
+
+        createButton.setOnClickListener(v -> {
+            String matchName = matchNameInput.getText().toString();
+            String place = placeInput.getText().toString();
+            int numberOfOvers = Integer.parseInt(oversInput.getText().toString());
+            int maxOversPerBowler = Integer.parseInt(maxOversInput.getText().toString());
+            int wideNoBallExtraRunValue = Integer.parseInt(extraRunInput.getText().toString());
+
+            Calendar matchDate = Calendar.getInstance();
+            matchDate.set(selectedDate[0], selectedDate[1], selectedDate[2]);
+
+            Match match = new Match(matchName, matchDate.getTime(), place, numberOfOvers, maxOversPerBowler, wideNoBallExtraRunValue);
+            matches.add(match);
+            matchAdapter.notifyDataSetChanged();
+
+            Toast.makeText(getContext(), "Match created successfully!", Toast.LENGTH_SHORT).show();
+        });
+    }
+
+    private void editMatch(int position) {
+        Match match = matches.get(position);
+        // Logic to populate the form with match details for editing
+        // Update the match in the list after editing
+        matches.set(position, match);
+        matchAdapter.notifyDataSetChanged();
     }
 
     @Override
